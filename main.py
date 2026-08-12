@@ -5,16 +5,16 @@ main.py — entry point for the TikTok Auto-Poster.
 Two modes:
   python main.py --now          # run the pipeline once immediately, then exit
   python main.py                # start the daily scheduler (default)
-
-The scheduler runs the full pipeline once every 24 hours at the hour
-specified by RUN_HOUR in .env (default: noon).
 """
 from __future__ import annotations
 
 import argparse
+import os
 import signal
 import sys
-from datetime import datetime, time as dt_time
+
+# Ensure Python can find local modules when run from GitHub Actions
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -60,7 +60,7 @@ def run_scheduler() -> None:
     signal.signal(signal.SIGINT, _shutdown)
     signal.signal(signal.SIGTERM, _shutdown)
 
-    # Run once immediately on first start (so you don't wait up to 24h)
+    # Run once immediately on first start
     logger.info("Triggering an immediate first run…")
     _job()
 
