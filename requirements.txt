@@ -1,0 +1,9 @@
+# --- TikTok Auto-Poster — Python dependencies ---
+groq>=0.11.0
+edge-tts>=6.1.10
+moviepy>=1.0.3
+apscheduler>=3.10.4
+python-dotenv>=1.0.1
+requests>=2.31.0
+whisper>=1.0  # OpenAI Whisper (local) for auto-subtitles; optional fallback below
+# If Whisper is too heavy, the code falls back to a simple word-timing estimator.
