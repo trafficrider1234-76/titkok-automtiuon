@@ -13,8 +13,9 @@ import os
 import signal
 import sys
 
-# Ensure Python can find local modules when run from GitHub Actions
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Force Python to look in the current directory for modules
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
