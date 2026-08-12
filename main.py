@@ -10,19 +10,37 @@ from __future__ import annotations
 
 import argparse
 import os
-import signal
 import sys
+import signal
 
-# Force Python to look in the current directory for modules
+# Add the current directory to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, current_dir)
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+# Try importing the module
+try:
+    from tiktok_auto_poster.config import CONFIG
+    from tiktok_auto_poster.logger import logger
+    from tiktok_auto_poster.pipeline import Pipeline
+except ModuleNotFoundError as e:
+    print(f"ERROR: {e}")
+    print(f"Current directory: {current_dir}")
+    print("Contents of current directory:")
+    for item in os.listdir(current_dir):
+        print(f"  - {item}")
+    
+    # Check if tiktok_auto_poster exists
+    if os.path.exists(os.path.join(current_dir, "tiktok_auto_poster")):
+        print("\n'tiktok_auto_poster' folder exists but Python can't find it.")
+        print("Make sure it has an __init__.py file.")
+    else:
+        print("\n'tiktok_auto_poster' folder not found!")
+        print("Please create the folder and add the required files.")
+    sys.exit(1)
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
-
-from tiktok_auto_poster.config import CONFIG
-from tiktok_auto_poster.logger import logger
-from tiktok_auto_poster.pipeline import Pipeline
 
 
 def _job() -> None:
@@ -53,7 +71,7 @@ def run_scheduler() -> None:
     )
 
     # Graceful shutdown
-    def _shutdown(signum, _frame) -> None:  # noqa: ANN001
+    def _shutdown(signum, _frame) -> None:
         logger.info("Received signal %d — shutting down scheduler.", signum)
         scheduler.shutdown(wait=False)
         sys.exit(0)
