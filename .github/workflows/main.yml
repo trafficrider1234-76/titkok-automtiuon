@@ -1,34 +1,31 @@
-name: 24/7 TikTok Automation
-
-on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
-
-jobs:
-  run-bot:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install system dependencies (ffmpeg)
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/sources.list.d/azure-cli.list
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-
-      - name: Install Python dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run script
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-        run: python main.py --now
+# In your .github/workflows/*.yml file
+steps:
+  - uses: actions/checkout@v3
+  
+  - name: Set up Python
+    uses: actions/setup-python@v4
+    with:
+      python-version: '3.10'
+  
+  - name: Install dependencies
+    run: |
+      pip install -r requirements.txt
+  
+  - name: Fix import structure
+    run: |
+      # Create tiktok_auto_poster folder if it doesn't exist
+      mkdir -p tiktok_auto_poster
+      # Move Python files into the folder (except main.py)
+      for file in config.py logger.py pipeline.py processing_engine.py script_engine.py tiktok_author.py tiktok_uploader.py video_engine.py voice_engine.py; do
+        if [ -f "$file" ]; then
+          mv "$file" tiktok_auto_poster/
+        fi
+      done
+      # Create __init__.py if it doesn't exist
+      touch tiktok_auto_poster/__init__.py
+      # Show structure for debugging
+      ls -la
+      ls -la tiktok_auto_poster/
+  
+  - name: Run main.py
+    run: python main.py
